@@ -1,0 +1,852 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2021
+
+% ready for submission
+% \usepackage{neurips_2021}
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+    \usepackage[preprint]{neurips_2021}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+    % \usepackage[final]{neurips_2021}
+
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{neurips_2021}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{fancyhdr}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{multirow}
+
+\title{Identification and Synthesizing of Raphael’s Paintings from the Forgeries}
+
+\author{%
+  Jialun Shen \\
+  School of Data Science\\
+  Fudan University\\
+  Shanghai, China \\
+  \texttt{16307110030@fudan.edu.cn} \\
+  \And
+  Ruifan Deng \\
+  School of Data Science \\
+  Fudan University\\
+  Shanghai, China \\
+  \texttt{18300180053@fudan.edu.cn} \\
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  Artistic authentication and image style transfer for painting have important applications in art. These two tasks are challenging in computer vision due to the complexity of artworks. In this project, we focus on identification and synthesizing of Raphael’s paintings from the forgeries.
+  For artistic authentication task, we test combinations of different feature extraction methods and classification algorithms, and predict labels for disputed paintings whose author may be Raphael or not. 
+  For image style transfer task, we utilize a classic model-optimisation-based neural style transfer method to transfer arbitrary pictures into ones with the style of Raphael paintings.
+  % The source code is available at \url{https://github.com/sgallon-rin/neural-network-deep-learning-final}
+\end{abstract}
+
+\section{Introduction}
+
+% Introduction to the background and potential applications
+
+% The following data is provided by Prof. Yang WANG from HKUST8. Since this link is in google drive, you can
+% download the file from our course webpage9. The data contains 28 digital paintings of Raphael or forgeries. Note
+% that there are both jpeg and tiff files, so be careful with the bit depth in digitization. The following file10 contains
+% the labels of such paintings.
+% 2.3.1 Questions
+% 1. Can you exploit the known Raphael v.s. Not Raphael data to predict the identity of those 6 disputed paintings
+% (maybe Raphael)? The following papers11 12 might be some references for you.
+% 2. We need to synthesize the painting of Raphael. That is, given one photo, we need to generate/synthesize a
+% new photo that makes it look like Raphael. There are lots of recent works on this topic. You can try it by
+% either (1) Generative Adversarial Networks [2], or Convolutional Neural Networks [1], or Attribute transfer
+% [3]. The testing images are downloaded from 13. You can use the images in 14 as well as other available images
+% online to train your model. Your report should show the effects of synthesized testing images.
+
+% \subsection{Artistic authentication}
+
+\textit{Artistic Authentication} is the identification of genuine paintings by famous artists and detection of forgery paintings by imitators. 
+Traditional approaches usually rely on experts' discerning eyes and experience.
+In the past decade, advances have been made to apply statistical and quantitative techniques for authorship and style evolution in literary arts, by using high-resolution digital images of artists’ collections. 
+For art authentication, the key point is to find the appropriate features which give a good separation between the artist’s paintings and those by his imitators. 
+Various feature extraction methods have been proposed for artistic authentication. 
+Geometric tight frame~\citep{liu2016geometric} and Gabor wavelet transformation~\citep{johnson2008image} are two representative feature extraction methods, which will be compared through experiments in Section \ref{experiments}.
+
+% \subsection{Image style transfer}
+
+\textit{Image Style Transfer} is the task of rendering an image with artistic features guided by a style reference while maintaining the original content.
+In the past, re-drawing an image in a particular style requires a well-trained artist and lots of time. 
+Since the mid-1990s, the art theories behind the appealing artworks have been attracting the attention of not only the artists but many computer science researchers. 
+There are plenty of studies and techniques exploring how to automatically turn images into synthetic artworks.
+Inspired by the power of \textit{Convolutional Neural Networks} (CNNs), 
+\citet{gatys2015neural} first study how to use a CNN to reproduce famous painting styles on natural images. 
+This process of using CNNs to render a content image in different styles is referred to as \textit{Neural Style Transfer} (NST).
+Since then, NST has become a trending topic both in academic literature and industrial applications.
+Common uses for NST are the creation of artificial artwork from photographs, for example, by transferring the appearance of famous paintings to user-supplied photographs.
+NST algorithms enable artists and designers around the globe to develop new artwork based on existent style(s).
+
+
+\section{Related work}
+\label{related-work}
+
+% Review of the state-of-the-arts
+
+\subsection{Artistic authentication}
+
+\citet{johnson2008image} report their analysis of van Gogh’s brushstrokes using several types of wavelet transformation.
+\citet{li2011rhythmic} further make an effort to extract visually salient brushstrokes of van Gogh based on an integrative technique of both edge detection and clustering based segmentation. 
+With the extracted brushstrokes, some definitions of brushstroke features for art authentication were given in distinguishing van Gogh paintings from forgeries.
+
+\citet{qi2013visual} use background selection and wavelet-HMT-based Fisher information distance for authorship and dating of impressionist and post-impressionist paintings. 
+They find that background information is much more reliable than the details of an intricate object which cannot represent the artist's natural style because of multiple edits and corrections. They also find that an artist's style should be interpreted as a probability distribution over a set of possible textures, and not just simply from the textures themselves.
+
+\citet{liu2016geometric} propose a geometric tight frame based visual stylometry method to discriminate paintings by van Gogh from those by imitators. 
+The methodology consists of some simple statistics of the geometric tight frame coefficients, as well as a boosting procedure for feature selection.
+
+\subsection{Image style transfer}
+
+Artistic stylisation is a long-standing research topic. 
+Due to its wide variety of applications, it has been an important research area for more than two decades. 
+Before the appearance of NST, the related researches have expanded into an area called \textit{non-photorealistic rendering} (NPR). 
+Some \textit{image-based artistic rendering} (IB-AR) methods without CNNs have been proposed, such as stroke-based rendering~\citep{hertzmann1998painterly}, region-based rendering~\citep{kolliopoulos2005image,gooch2002artistic,song2008arty}, example-based rendering~\citep{hertzmann2001image,zhao2011portrait}, image processing and filtering~\citep{winnemoller2006real}. 
+These algorithms without CNNs are capable of faithfully depicting certain prescribed styles. However, they typically have the
+limitations in flexibility, style diversity, and effective image structure extractions. 
+Therefore, there is a demand for novel algorithms to address these limitations, which gives birth to the field of NST.
+
+NST derived from two well-studied tasks: \textit{Visual Texture Modelling}, which models and extracts artistic style from an image, 
+and \textit{Image Reconstruction}, which reconstruct the whole input image from the extracted image representation.
+Following the taxonomy of NST techniques proposed by \citet{jing2019neural}, 
+current NST methods fit into one of the two categories: \textit{Image-Optimisation-Based Online Neural Methods}
+and \textit{Model-Optimisation-Based Offline Neural Methods}.
+
+Due to the locality and spatial invariance in CNNs, it is difficult to extract and maintain the global information of input images. 
+Therefore, traditional NST methods are usually biased and content leak can be observed by running several times of the style transfer process with the same reference style image.
+Some novel methods that do not rely on CNN have been proposed to tackle this problem. 
+\citet{deng2021stytr} propose the first transformer-based style transfer method, 
+taking long-range dependencies of input images into account for unbiased style transfer.
+
+In this project, we focus on traditional NST methods.
+
+\subsubsection{Image-optimisation-based online neural methods}
+
+Image-optimisation-based NST transfers the style by iteratively optimising an image~\citep{gatys2015neural,li2017demystifying,risser2017stable,li2017laplacian,li2016combining}. 
+The common limitation of image-optimisation-based NST algorithms is that they are computationally expensive, due to the iterative image optimisation procedure.
+
+% The first subset of image-optimisation-based NST is based on \textit{Parametric Texture Modelling with Summary Statistics}. 
+
+\citet{gatys2015neural,Gatys_2016_CVPR} propose the first NST algorithm. They find that a deep convolutional neural network is capable of extracting image content from an arbitrary photograph and some appearance information from the well-known artwork. 
+They build the content component of the newly stylised image by penalising the difference of high-level representations derived from content and stylised images, and further build the style component by matching Gram-based summary statistics of style and stylised images.
+
+% \citet{li2017demystifying} derive some different style representations by considering style transfer in the domain of transfer learning.
+% They theoretically demonstrate that the Gram matrices matching process in NST is equivalent to minimising \textit{Maximum Mean Discrepancy} (MMD) with the second order polynomial kernel, thus proposing a timely interpretation of NST and making the principle of NST clearer.
+
+\subsubsection{Model-optimisation-based offline neural methods}
+
+Model-optimisation-based NST optimises a generative model offline and produces the stylised image with a single forward pass. 
+Depending on the number of artistic styles a single generative model can produce,
+model-optimisation-based NST algorithms are further divided into 
+\textit{Per-Style-Per-Model} (PSPM) methods~\citet{johnson2016perceptual,ulyanov2016texture,ulyanov2017improved,li2016precomputed},
+\textit{Multiple-Style-Per-Model} (MSPM) methods~\citep{dumoulin2016learned,Chen_2017_CVPR,li2017diversified,Zhang_2018_ECCV_Workshops}, 
+and \textit{Arbitrary-Style-Per-Model} (ASPM) methods~\citep{huang2017arbitrary,chen2016fast,gu2018arbitrary,ghiasi2017exploring,li2017universal}.
+
+PSPM approaches can produce stylised images two orders of magnitude faster than previous image-optimisation-based NST methods, achieving real-time style transfer. Separate generative networks have to be trained for each particular style image.
+
+\citet{johnson2016perceptual} and \citet{ulyanov2016texture} share a similar idea of pretraining a feed-forward style-specific network and produce a stylised result with a single forward pass at testing stage.
+
+\citet{ulyanov2017improved} further find that simply applying normalisation to every single image rather than a batch of images leads to a significant improvement in stylisation quality. This single image normalisation is called \textit{instance normalization} (IN). 
+The style transfer network with IN is shown to converge faster than BN and also achieves visually better results.
+
+MSPM improves the flexibility of PSPM by further incorporating multiple styles into one single model. MSPM is achieved either by tying only a small number
+of parameters in a network to each style~\citep{dumoulin2016learned,Chen_2017_CVPR} or still exploiting only a single network like PSPM but combining both style and content as inputs~\citep{li2017diversified,Zhang_2018_ECCV_Workshops}.
+
+\citet{Chen_2017_CVPR} use separate network components to learn the corresponding content and style information. 
+Mid-level convolutional filters (called ``StyleBank'' layer) are used to individually learn different styles. 
+The rest components in the network are used to learn content information, which is shared by different styles. 
+Their algorithm also supports flexible incremental training, which is to fix the content components in the network and train a ``StyleBank'' layer for a new style.
+
+Given $N$ target styles, \citet{li2017diversified} design a selection unit for style selection, which is a $N$-dimensional one-hot vector.
+Each bit in the selection unit represents a specific style in the set of target styles. For each bit in the selection unit, they first sample a corresponding noise map from a uniform distribution and then feed it into the style sub-network to obtain the corresponding style encoded features. 
+By feeding the concatenation of the style encoded features and the content encoded features into the decoder part of the style transfer network, the desired stylised result can be produced.
+
+ASPM aims at one-model-for-all, i.e., one single trainable model to transfer arbitrary artistic styles. 
+There are two types of ASPM, one built upon Non-parametric Texture Modelling with MRFs~\citep{Chen_2017_CVPR,gu2018arbitrary} and the other one built upon Parametric Texture Modelling with Summary Statistics~\citep{huang2017arbitrary,ghiasi2017exploring,li2017universal}.
+
+\section{Approach}
+\label{approach}
+
+% Algorithms and critical codes in a nutshell
+
+\subsection{Artistic authentication}
+
+Artistic authentication requires delicate analysis of specific style and habits. Although perceptual meaningfulness is a subjective concept, it can be measured with a computer by using techniques derived from biological and psychological models of the human visual system. 
+The key point is to find the appropriate features which give a good separation between the artists’ paintings and those by his imitators. 
+We use geometric tight frame~\citep{liu2016geometric} and Gabor wavelet transformation~\citep{johnson2008image} for feature engineering.
+
+\paragraph{Geometric tight frame filters \& moment statistics}
+
+The Geometric tight frame we use has 18 filters $\tau_0,\tau_1,\cdots,\tau_{17}$. They can capture the first and second-order differences in the horizontal, vertical and diagonal directions in every small neighborhood of the paintings. The first three filters are shown below. Please refer to \citet{liu2016geometric} to check all the filters.
+
+\begin{equation}
+\tau_0 = \frac{1}{16}
+\begin{bmatrix}
+1 & 2 & 1 \\
+2 & 4 & 2 \\
+1 & 2 & 1
+\end{bmatrix},
+\tau_1 = \frac{1}{16}
+\begin{bmatrix}
+1 & 0 & -1 \\
+2 & 0 & -2 \\
+1 & 0 & -1
+\end{bmatrix},
+\tau_2 = \frac{1}{16}
+\begin{bmatrix}
+1 & 2 & 1 \\
+0 & 0 & 0 \\
+-1 & -2 & -1
+\end{bmatrix}.
+\end{equation}
+
+Given the $i$-th color painting, with $m_i$-by-$n_i$ pixels, we represent its grey-scale intensity by an $m_i$-by-$n_i$ matrix $P_i$. 
+Convolve $P_i$ with each $\tau_j$, $0<\leq j \leq 17$, to get the corresponding $m_i$-by-$n_i$ tight frame coefficient matrices $A^{(i,j)}$:
+
+\begin{equation}
+A^{(i,j)} = P_i*\tau_j = 
+\begin{pmatrix}
+a_{1,1}^{(i,j)} & \cdots & a_{1,n_i}^{(i,j)}\\
+\vdots & & \vdots\\
+a_{m_i,1}^{(i,j)} & \cdots & a_{m_i,n_i}^{(i,j)}
+\end{pmatrix},
+\quad 0\leq j \leq 17.
+\end{equation}
+
+
+After the decomposition, there are 18 corresponding matrices for each painting. 
+To capture the characteristics of the decomposition, we use three statistics as proposed by \citet{liu2016geometric}. They are, specifically,
+
+(i) the mean of the entries in the coefficient matrix $A^{(i,j)}$:
+\begin{equation}
+\mu^{(i,j)} = \frac{1}{m_in_i}\sum_{l=1}^{m_i}\sum_{k=1}^{n_i}a_{l,k}^{(i.j)},
+\end{equation}
+
+(ii) the standard deviation of the entries in $A^{(i,j)}$:
+\begin{equation}
+\sigma^{(i,j)} = \left(\frac{1}{m_in_i-1}\sum_{l=1}^{m_i}\sum_{k=1}^{n_i}
+\left(a_{l,k}^{(i.j)} - \mu^{(i,j)}
+\right)^2\right)^{\frac{1}{2}},
+\end{equation}
+
+(iii) the percentage of the ``tail entries'', which are entries that lies outside one standard deviation from the mean:
+\begin{equation}
+p^{(i,j)} = \#(\hat{A}^{(i,j)})/(m_in_i),
+\end{equation}
+where $\#(\hat{A}^{(i,j)})$ is the number of nonzero entries in the tail matrix $\hat{A}^{(i,j)}$ which is defined by:
+\begin{equation}
+\hat{a}_{l,k}^{(i,j)} = 
+\begin{cases}
+a_{l,k}^{(i,j)}, & \text{if } |a_{l,k}^{(i,j)} - \mu^{(i,j)}|\geq\sigma^{(i.j)}\\
+0, & \text{otherwise}
+\end{cases}.
+\end{equation}
+
+Therefore, the feature vector of the $i$-th painting is represented by 
+\begin{equation}
+\left(
+\mu^{(i,0)},\cdots,\mu^{(i,17)},
+\sigma^{(i,0)},\cdots,\sigma^{(i,17)},
+p^{(i,0)},\cdots,p^{(i,17)}
+\right).
+\end{equation}
+
+\paragraph{GaborWavelet filters \& energy values}
+
+Next, we apply Gabor wavelet transformation~\citep{johnson2008image} in feature extraction. 
+Gabor wavelet is similar to human visual system in terms of response mechanism, 
+and can capture local features in multiple orientations and scales. 
+Multiscale-oriented Gabor wavelet filters are sensitive to particular wave-like patterns.
+The Gabor wavelet filters come in pairs: $G_{even}(x,y,\sigma,\alpha,\omega)$ and $G_{odd}(x,y,\sigma,\alpha,\omega)$ are, 
+respectively, the real and imaginary parts of the function:
+\begin{equation}
+e^{2\pi i\omega (x\sin\alpha+y\cos\alpha)}
+e^{-\frac{x^2+y^2}{2\sigma^2}},
+\end{equation}
+where $x$ and $y$ are the spatial coordinates assuming the filters are centered at the origin, $\alpha$ sets the spatial orientation and $\omega$ the spatial frequency of the filter pair.
+
+In theory, there are infinite number of Gabor filters. 
+In an attempt to balance efficiency and convenience, we apply a set of filters that covers a range of orientations and scales: six orientations ($\alpha=(\nicefrac{k}{6})\pi$, for $k\in\{0,1,2,3,4,5\}$) and four scales (manually set $\omega$ and $\sigma$). 
+Figure \ref{fig:gabor-wavelet} visualizes 24 filters.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=5.5cm]{figure/gabor-wavelet.png}
+  \caption{Visualization of 24 Gabor filters~\citep{johnson2008image}}
+  \label{fig:gabor-wavelet}
+\end{figure}
+
+Convolving these filter with an image yields a decomposition of the image structure into ``energy values'', one energy value for each pixel, orientation, and scale. 
+The Gabor wavelet energy value of an image patch is defined as the sum of the squared values obtained by convolving both components with an image patch. The whole process is shown in Figure \ref{fig:gabor}.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figure/gabor.png}
+  \caption{Example of an image patch (left) and the responses of the filters (right; dark to bright indicate low to high energy)~\citep{johnson2008image}}
+  \label{fig:gabor}
+\end{figure}
+
+After feature extraction, we use several classification algorithms to perform the artistic authentication task. We use: (i) \textit{Support Vector Machine} (SVM), without kernel and with penalty coefficient 1; (ii) \textit{Decision Tree} (DT); (iii) \textit{K-Nearset Neighbor} (KNN); (iv) \textit{Neural Network} (NN), with one hidden layer containing 7 hidden units and a dropout layer with dropout probability 0.5. In addition, we apply forward stage-wise feature selection according to AUC.
+
+\subsection{Image style transfer}
+
+The NST algorithm we use is a PSPM method based on the work of \citet{gatys2015neural,johnson2016perceptual,ulyanov2017improved}. 
+The main idea for style transfer task is to extract the low level features like the texture and color from the \textit{style image} $I_s$, 
+and apply it to some more semantic and high level features on a \textit{content image} $I_c$ to derive the \textit{style-transferred image} $I$. 
+
+Roughly speaking, the output image $I$ should be the one preserving the objects and concepts in the content image $I_c$ whilst deviating little from the style image $I_s$ in terms of the style. 
+We can introduce a loss funciton to measure the difference between $I$ and $\{I_s,I_c\}$, 
+and what we need to do is to produce the optimal $I^*$ that minimizes the loss function.
+In this way, image style transfer problem can be reduced to an optimization problem:
+\begin{equation}
+I^* = \arg\min_{I}\left(\alpha\mathcal{L}_{content}(I_c,I)
++\beta\mathcal{L}_{style}(I_s,I)\right),
+\end{equation}
+where $\alpha$ and $\beta$ are two hyper-parameters that allow us to control how much emphasis we want to put on the content relative to the style, 
+$\mathcal{L}_{content}(I_c,I)$ and $\mathcal{L}_{style}(I_s,I)$ are the content and style loss function, respectively.
+
+The key point \citet{gatys2015neural} proposed is that content and style losses are not based on pixel loss (the Euclidean distance between the output $I$ and the target $I_c$ or $I_s$), but instead in terms of some more perceptual differences between the images. 
+Pre-trained CNNs on a large image data set are able to encode perceptual and semantic information that we need to grasp the semantic differences. 
+In our experiments (Section \ref{style-experiments}), VGG-19 network~\citep{simonyan2014very} trained on the ImageNet data set~\citep{russakovsky2015imagenet} is used as the loss network, denoted as $\phi$.
+
+Let $\phi^j(I)$ be the activations of the $j$-th layer of the loss network $\phi$. Following the definition of \citet{gatys2015neural,johnson2016perceptual}, we define the content and style loss functions, as well as a total variational regularization term.
+
+\paragraph{Content loss} The content loss is the squared Euclidean distance between feature representations of the content and combination images:
+\begin{equation}
+\mathcal{L}_{content}(I_c,I) = ||\phi^j(I_c) - \phi^j(I)||_2^2.
+\end{equation}
+
+\paragraph{Style loss} Style loss is based on a \textit{Gram matrix} $G^l(I)$,
+which is propotional to the covariances of corresponding sets of features in the $l$-th layer. The elements of $G^l(I)$ is defined as:
+\begin{equation}
+G_{ij}^l(I) = \frac{1}{M^l}\sum_{k=1}^{M^l}\phi_{ik}^l(I)\phi_{jk}^l(I),
+\end{equation}
+where $\phi_{ik}^l$ denotes the $k$-th position of the $i$-th vectorized feature map in the $l$-th layer, $M^l$ is the number of elements in each feature map. 
+The loss function of style representation in the l-th layer is then defined as the squared Frobenius norm of the difference between the Gram matrices of the style
+and combination images:
+\begin{equation}
+\mathcal{L}_{style}^l(I_s,I) = ||G^l(I_s) - G^l(I)||_F^2,
+\end{equation}
+and the total style loss is a weighted sum of the contribution from each layer:
+\begin{equation}
+\mathcal{L}_{style}(I_s,I) = \sum_{l=1}^Lw_l\mathcal{L}_{style}^l(I_s,I).
+\end{equation}
+
+\paragraph{Total variational regularization} A regularization term is added to to loss function, so as to encourage spatial smoothness. 
+The total variation encourages images to consist piece-wise constant patches. 
+For a continuous function $f:\mathbb{R}^2\supset \Omega \to \mathbb{R}$, the total variation is given by:
+\begin{equation}
+\mathcal{R}(f,\delta) = \int_{\Omega}\left[
+\left(\frac{\partial f}{\partial u}(u,v)\right)^2 + 
+\left(\frac{\partial f}{\partial v}(u,v)\right)^2
+\right]^{\nicefrac{\delta}{2}}\text{d}u\text{d}v.
+\end{equation}
+For a discrete input image $x\in\mathbb{R}^{H\times W}$, the total variation is replaced by the finite discrete approximation:
+\begin{equation}
+\mathcal{R}(x,\delta) = \sum_{i,j}\left(
+\left(x_{i,j+1}-x{i,j}\right)^2 + 
+\left(x_{i+1,j}-x_{i,j}\right)^2 
+\right)^{\nicefrac{\delta}{2}},
+\end{equation}
+where $\delta$ is modified to balance the sharpness of the image against the removal of the artifacts called ``spikes''.
+According to \citet{krishnan2009fast}, regularizer with $\delta<1$ is often used as a better match of the gradient statistics of natural images, 
+while by choosing $\delta>1$ changes in images are distributed across regions rather than concentrated at a point or curve. 
+When the target of the reconstruction is a colour image, 
+the regulariser is summed for each colour channel.
+
+\paragraph{Total loss function}
+
+Based on the loss functions and regularization term defined above, the total loss function becomes:
+\begin{equation}
+\mathcal{L}(I_c,I_s,I) = \alpha\mathcal{L}_{content}(I_c,I)
++ \beta\mathcal{L}_{style}(I_s,I) + \gamma\mathcal{R}(I,\delta),
+\end{equation}
+where $\alpha,\beta,\gamma,\delta$ are hyperparameters. The final style-transferred image $I^*$ satisfies:
+\begin{equation}
+I^* = \arg\min_{I}\mathcal{L}(I_c,I_s,I).
+\end{equation}
+
+Besides, we also use the instance normalization technique proposed by \citet{ulyanov2017improved}.
+
+\section{Experiments}
+
+% Experimental analysis and discussion of proposed methodology
+
+\subsection{Datasets and settings}
+
+The data set provided by Prof. Yang Wang from HKUST\footnote{https://drive.google.com/folderview?id=0B-yDtwSjhaSCZ2FqN3AxQ3NJNTA\&usp=sharing} consists of high resolution scans of 28 paintings, scaled to a uniform density of 200 dots per painted inch. The picture size vary from 1192*748 to 6326*4457 pixels. 
+Of the 28 paintings, 12 have been attributed to Raphael, 9 have been known to be non-Raphael, and others are currently questioned by experts. 
+
+For artistic authentication task, we change them into grey-scale scans for easier studying and feature capturing. Usually, turning a colored picture into grey-scale might lose information. In this specific problem, however, the pictures given are all single-colored sketches (like the two examples shown in Figure \ref{fig:data-example}). Thus, grey-scale does not make much difference.
+
+\begin{figure}[htb]
+\centering
+\subfigure[No.5 Raphael]{
+\includegraphics[height=5.5cm]{figure/5-T.jpg}
+}
+\quad
+\subfigure[No.11 non-Raphael]{
+\includegraphics[height=5.5cm]{figure/11-N.jpg}
+}
+\caption{Example pictures from the data set}
+\label{fig:data-example}
+\end{figure}
+
+There are numerous ways for grey-scale transformation. A simple and widely used formula is from BT.601, a standard issued in 1982:
+\begin{equation}
+\text{Grey} = \text{Red} * 0.299 + \text{Green} * 0.587 + \text{Blue} * 0.114.
+\end{equation}
+
+Note that the data set is quite small, with only 21 labeled pictures,
+which is enough for synthesization but not for classification. 
+Also, the size of each picture is quite large.
+In an attempt to enlarge this data set, we cut each labeled image into 4 parts. 
+Thus we get 84 labeled pictures in total.
+
+For image style transfer task, we choose two paintings attributed to Raphael (as shown in Figure \ref{fig:style-images}) as the style images. We use the COCO2014 training images\footnote{http://images.cocodataset.org/zips/train2014.zip} data set as content images during training. The data set has 82,783 images.
+
+\begin{figure}[htb]
+\centering
+\subfigure[No.21 Raphael]{
+\includegraphics[height=4cm]{figure/21-T.jpg}
+}
+\quad
+\subfigure[No.22 Raphael]{
+\includegraphics[height=4cm]{figure/22-T.jpg}
+}
+\caption{Chosen style images}
+\label{fig:style-images}
+\end{figure}
+
+\subsection{Artistic authentication}
+\label{experiments}
+
+We randomly split 84 labeled pictures into training set and test set. We adopt leave-one-out cross-validation on training set to select features. Experiment results with \textit{true positive rate} (TPR), \textit{true negative rate} (TNR) and accuracy of all models are shown in Table \ref{tab:auth}.
+
+\begin{table}[htb]
+  \caption{Experiment result for artistic authentication}
+  \label{tab:auth}
+  \centering
+  \begin{tabular}{ccccc}
+\hline
+Feature extraction method      & Model & TPR   & TNR   & Accuracy \\ \hline
+\multirow{4}{*}{Tight frame}   & SVM   & 0.923 & 0.875 & 0.905    \\
+                               & DT    & 0.923 & \textbf{1.000}     & \textbf{0.952}    \\
+                               & KNN   & 0.615 & 0.625 & 0.619    \\
+                               & NN    & 0.846 & 0.500   & 0.714    \\ \hline
+\multirow{4}{*}{Gabor wavelet} & SVM   & \textbf{1.000}     & 0.000     & 0.619    \\
+                               & DT    & 0.846 & 0.625 & 0.762    \\
+                               & KNN   & \textbf{1.000}     & 0.500   & 0.81     \\
+                               & NN    & 0.846 & 0.375 & 0.667   \\ \hline
+\end{tabular}
+\end{table}
+
+The overall performance based on Tight Frame filters seems to be better than that of Gabor Wavelet. 
+Models with Gabor wavelet have low TNRs, which means fake paintings cannot be identified correctly. 
+It also seems that different combination of feature selection and classification methods vary a lot in performance. 
+Decision tree with tight frame performs best among all the 8 models, with the highest accuracy of 0.952. Table \ref{tab:auth-pred} shows its prediction of disputed paintings, where $p$ is the probability of being Raphael's work. Note that we also divide the test paintings into 4 parts, for each part predicted as being Raphael's work, we add its $p$ with 0.25.
+
+\begin{table}[htb]
+  \caption{Prediction for disputed paintings}
+  \label{tab:auth-pred}
+  \centering
+  \begin{tabular}{ccc}
+\hline
+Painting No. & $p$  & Label  \\ \hline
+1            & 0.5 & (remains disputed) \\
+7            & 1  & Raphael  \\
+10           & 1  & Raphael  \\
+20           & 0.25 & non-Raphael \\
+23           & 0.75 & Raphael \\
+25           & 0.25 & non-Raphael \\
+26           & 0  & non-Raphael  \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Image style transfer}
+\label{style-experiments}
+
+We train our model on a Nvidia GTX 2080Ti GPU. As the method we use is model-based, it can perform fast (in less than a second on GPUs) style transfer after training. With low computational cost, it can also work on CPUs to perform offline image transfer. The default setting we use for Raphael style transfer is shown in Table \ref{tab:default-setting}. With the default settings, training time is about 1.5 hours.
+
+\begin{table}[htb]
+  \caption{Default setting for Raphael style transfer}
+  \label{tab:default-setting}
+  \centering
+  \begin{tabular}{cc}
+\hline
+Hyperparameter & Value   \\ \hline
+style image           & No. 22  \\
+number of epochs           & 2  \\
+batch size            & 4   \\
+content weight $\alpha$          & 7.5  \\
+style weight $\beta$           & 100  \\
+total variation weight $\gamma$           & 200 \\
+total variation parameter $\delta$           & 1  \\
+learning rate           & 0.001  \\ \hline
+\end{tabular}
+\end{table}
+
+Figure \ref{fig:style-train} shows how the model gradually learns to transfer image styles. Actually, there seem to be little difference among style-transferred images after the first epoch. 
+We tried different style weights $\alpha\in\{1, 10, 100\}$ to test the effect of the ratio $\nicefrac{\alpha}{\beta}$. A comparision of style transfer effect after 2 epoches is shown in Figure \ref{fig:style-weight}. These pictures look very similar expect for some details of dark area.
+Furthermore, we also try different works of Raphael as the style image. Figure \ref{fig:style-style} shows the effect of different style images.
+
+To see all the effects of synthesized testing images, please refer to Appendix \ref{appendix}.
+
+\begin{figure}[htbp]
+\centering
+\subfigure[style image: No.21]{
+\includegraphics[width=5.5cm]{figure/train/st21/1_20695.png}
+}
+\quad
+\subfigure[style image: No.22]{
+\includegraphics[width=5.5cm]{figure/train/default/1_20695.png}
+}
+\caption{Synthesized images with different style images}
+\label{fig:style-style}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\subfigure[original content]{
+\includegraphics[width=5.5cm]{figure/test.jpg}
+}
+\quad
+\subfigure[epoch 1, iteration 2000]{
+\includegraphics[width=5.5cm]{figure/train/default/0_2000.png}
+}
+\quad
+\subfigure[epoch 1, iteration 10000]{
+\includegraphics[width=5.5cm]{figure/train/default/0_10000.png}
+}
+\quad
+\subfigure[epoch 1, iteration 20000]{
+\includegraphics[width=5.5cm]{figure/train/default/0_20000.png}
+}
+\quad
+\subfigure[epoch 2, iteration 10000]{
+\includegraphics[width=5.5cm]{figure/train/default/1_10000.png}
+}
+\quad
+\subfigure[epoch 2, iteration 20695 (final)]{
+\includegraphics[width=5.5cm]{figure/train/default/1_20695.png}
+}
+\caption{Synthesized images in different iterations during training}
+\label{fig:style-train}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\subfigure[original content]{
+\includegraphics[width=5.5cm]{figure/test.jpg}
+}
+\quad
+\subfigure[$\alpha$=100]{
+\includegraphics[width=5.5cm]{figure/train/default/1_20695.png}
+}
+\quad
+\subfigure[$\alpha$=10]{
+\includegraphics[width=5.5cm]{figure/train/sw10/1_20695.png}
+}
+\quad
+\subfigure[$\alpha$=1]{
+\includegraphics[width=5.5cm]{figure/train/sw1/1_20695.png}
+}
+\caption{Synthesized images with different style weights}
+\label{fig:style-weight}
+\end{figure}
+
+\section{Conclusion}
+
+In this project, we use machine learning and computer vision techniques to complete two challenging problems: artistic authentication and image style transfer. Specifically, we study methods for identification and synthesizing of Raphael’s paintings from the forgeries.
+We test combinations of two feature extraction methods (geometric tight frame and Gabor wavelet transformation) and four classification algorithms (SVM, decision tree, KNN, neural network). Through experiments, we find that ``decision tree + geometric tight frame'' method has the best performance, and use it to predict labels for disputed Raphael paintings. 
+For image style transfer task, we utilize a CNN-based, model-optimisation-based neural style transfer method, with well-designed content loss, style loss and total variational regularization, to transfer arbitrary pictures into ones with the style of Raphael paintings. For future work, we can try combing styles from multiple Raphale's works with similar original style, to acquire a more general style-transferer.
+
+\newpage
+\bibliographystyle{elsarticle-num-names}
+\interlinepenalty=10000
+\bibliography{reference}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \section*{Checklist}
+
+% %%% BEGIN INSTRUCTIONS %%%
+% The checklist follows the references.  Please
+% read the checklist guidelines carefully for information on how to answer these
+% questions.  For each question, change the default \answerTODO{} to \answerYes{},
+% \answerNo{}, or \answerNA{}.  You are strongly encouraged to include a {\bf
+% justification to your answer}, either by referencing the appropriate section of
+% your paper or providing a brief inline description.  For example:
+% \begin{itemize}
+%   \item Did you include the license to the code and datasets? \answerYes{See Section~\ref{gen_inst}.}
+%   \item Did you include the license to the code and datasets? \answerNo{The code and the data are proprietary.}
+%   \item Did you include the license to the code and datasets? \answerNA{}
+% \end{itemize}
+% Please do not modify the questions and only use the provided macros for your
+% answers.  Note that the Checklist section does not count towards the page
+% limit.  In your paper, please delete this instructions block and only keep the
+% Checklist section heading above along with the questions/answers below.
+% %%% END INSTRUCTIONS %%%
+
+% \begin{enumerate}
+
+% \item For all authors...
+% \begin{enumerate}
+%   \item Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
+%     \answerTODO{}
+%   \item Did you describe the limitations of your work?
+%     \answerTODO{}
+%   \item Did you discuss any potential negative societal impacts of your work?
+%     \answerTODO{}
+%   \item Have you read the ethics review guidelines and ensured that your paper conforms to them?
+%     \answerTODO{}
+% \end{enumerate}
+
+% \item If you are including theoretical results...
+% \begin{enumerate}
+%   \item Did you state the full set of assumptions of all theoretical results?
+%     \answerTODO{}
+% 	\item Did you include complete proofs of all theoretical results?
+%     \answerTODO{}
+% \end{enumerate}
+
+% \item If you ran experiments...
+% \begin{enumerate}
+%   \item Did you include the code, data, and instructions needed to reproduce the main experimental results (either in the supplemental material or as a URL)?
+%     \answerTODO{}
+%   \item Did you specify all the training details (e.g., data splits, hyperparameters, how they were chosen)?
+%     \answerTODO{}
+% 	\item Did you report error bars (e.g., with respect to the random seed after running experiments multiple times)?
+%     \answerTODO{}
+% 	\item Did you include the total amount of compute and the type of resources used (e.g., type of GPUs, internal cluster, or cloud provider)?
+%     \answerTODO{}
+% \end{enumerate}
+
+% \item If you are using existing assets (e.g., code, data, models) or curating/releasing new assets...
+% \begin{enumerate}
+%   \item If your work uses existing assets, did you cite the creators?
+%     \answerTODO{}
+%   \item Did you mention the license of the assets?
+%     \answerTODO{}
+%   \item Did you include any new assets either in the supplemental material or as a URL?
+%     \answerTODO{}
+%   \item Did you discuss whether and how consent was obtained from people whose data you're using/curating?
+%     \answerTODO{}
+%   \item Did you discuss whether the data you are using/curating contains personally identifiable information or offensive content?
+%     \answerTODO{}
+% \end{enumerate}
+
+% \item If you used crowdsourcing or conducted research with human subjects...
+% \begin{enumerate}
+%   \item Did you include the full text of instructions given to participants and screenshots, if applicable?
+%     \answerTODO{}
+%   \item Did you describe any potential participant risks, with links to Institutional Review Board (IRB) approvals, if applicable?
+%     \answerTODO{}
+%   \item Did you include the estimated hourly wage paid to participants and the total amount spent on participant compensation?
+%     \answerTODO{}
+% \end{enumerate}
+
+% \end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\appendix
+
+\section{Style transfer results for all testing images}
+\label{appendix}
+
+% Optionally include extra information (complete proofs, additional experiments and plots) in the appendix.
+% This section will often be part of the supplemental material.
+
+Figures below show the original testing images and style transferred ones.
+
+\begin{figure}[htbp]
+\centering
+\subfigure[original content]{
+\includegraphics[width=6cm]{figure/test_images/20140831_110634.jpg}
+}
+\quad
+\subfigure[$\alpha$=100, style=No. 22]{
+\includegraphics[width=6cm]{figure/eval/eval-default/20140831_110634.jpg}
+}
+\quad
+\subfigure[$\alpha$=1, style=No. 22]{
+\includegraphics[width=6cm]{figure/eval/eval-sw1/20140831_110634.jpg}
+}
+\quad
+\subfigure[$\alpha$=100, style=No. 21]{
+\includegraphics[width=6cm]{figure/eval/eval-st21/20140831_110634.jpg}
+}
+\caption{Synthesized images for test image No. 1}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\subfigure[original content]{
+\includegraphics[width=6cm]{figure/test_images/20140831_111733.jpg}
+}
+\quad
+\subfigure[$\alpha$=100, style=No. 22]{
+\includegraphics[width=6cm]{figure/eval/eval-default/20140831_111733.jpg}
+}
+\quad
+\subfigure[$\alpha$=1, style=No. 22]{
+\includegraphics[width=6cm]{figure/eval/eval-sw1/20140831_111733.jpg}
+}
+\quad
+\subfigure[$\alpha$=100, style=No. 21]{
+\includegraphics[width=6cm]{figure/eval/eval-st21/20140831_111733.jpg}
+}
+\caption{Synthesized images for test image No. 2}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\subfigure[original content]{
+\includegraphics[width=6cm]{figure/test_images/20140911_123628.jpg}
+}
+\quad
+\subfigure[$\alpha$=100, style=No. 22]{
+\includegraphics[width=6cm]{figure/eval/eval-default/20140911_123628.jpg}
+}
+\quad
+\subfigure[$\alpha$=1, style=No. 22]{
+\includegraphics[width=6cm]{figure/eval/eval-sw1/20140911_123628.jpg}
+}
+\quad
+\subfigure[$\alpha$=100, style=No. 21]{
+\includegraphics[width=6cm]{figure/eval/eval-st21/20140911_123628.jpg}
+}
+\caption{Synthesized images for test image No. 3}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\subfigure[original content]{
+\includegraphics[width=6cm]{figure/test_images/20140911_123811.jpg}
+}
+\quad
+\subfigure[$\alpha$=100, style=No. 22]{
+\includegraphics[width=6cm]{figure/eval/eval-default/20140911_123811.jpg}
+}
+\quad
+\subfigure[$\alpha$=1, style=No. 22]{
+\includegraphics[width=6cm]{figure/eval/eval-sw1/20140911_123811.jpg}
+}
+\quad
+\subfigure[$\alpha$=100, style=No. 21]{
+\includegraphics[width=6cm]{figure/eval/eval-st21/20140911_123811.jpg}
+}
+\caption{Synthesized images for test image No. 4}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\subfigure[original content]{
+\includegraphics[width=6cm]{figure/test_images/20140918_162417-2.jpg}
+}
+\quad
+\subfigure[$\alpha$=100, style=No. 22]{
+\includegraphics[width=6cm]{figure/eval/eval-default/20140918_162417-2.jpg}
+}
+\quad
+\subfigure[$\alpha$=1, style=No. 22]{
+\includegraphics[width=6cm]{figure/eval/eval-sw1/20140918_162417-2.jpg}
+}
+\quad
+\subfigure[$\alpha$=100, style=No. 21]{
+\includegraphics[width=6cm]{figure/eval/eval-st21/20140918_162417-2.jpg}
+}
+\caption{Synthesized images for test image No. 5}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+% \subfigure[original content]{
+% \rotatebox[origin=c]{-90}{\includegraphics[width=6cm]{figure/test_images/20150612_154907.jpg}
+% }}
+\subfigure[original content]{
+\includegraphics[height=5cm]{figure/test_images/20150612_154907.jpg}
+}
+\quad
+\subfigure[$\alpha$=100, style=No. 22]{
+\includegraphics[height=5cm]{figure/eval/eval-default/20150612_154907.jpg}
+}
+\\
+\quad
+\subfigure[$\alpha$=1, style=No. 22]{
+\includegraphics[height=5cm]{figure/eval/eval-sw1/20150612_154907.jpg}
+}
+\quad
+\subfigure[$\alpha$=100, style=No. 21]{
+\includegraphics[height=5cm]{figure/eval/eval-st21/20150612_154907.jpg}
+}
+\caption{Synthesized images for test image No. 6}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\subfigure[original content]{
+\includegraphics[width=6cm]{figure/test_images/20150626_152457.jpg}
+}
+\quad
+\subfigure[$\alpha$=100, style=No. 22]{
+\includegraphics[width=6cm]{figure/eval/eval-default/20150626_152457.jpg}
+}
+\quad
+\subfigure[$\alpha$=1, style=No. 22]{
+\includegraphics[width=6cm]{figure/eval/eval-sw1/20150626_152457.jpg}
+}
+\quad
+\subfigure[$\alpha$=100, style=No. 21]{
+\includegraphics[width=6cm]{figure/eval/eval-st21/20150626_152457.jpg}
+}
+\caption{Synthesized images for test image No. 7}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\subfigure[original content]{
+\includegraphics[width=6cm]{figure/test_images/20151102_031615.jpg}
+}
+\quad
+\subfigure[$\alpha$=100, style=No. 22]{
+\includegraphics[width=6cm]{figure/eval/eval-default/20151102_031615.jpg}
+}
+\quad
+\subfigure[$\alpha$=1, style=No. 22]{
+\includegraphics[width=6cm]{figure/eval/eval-sw1/20151102_031615.jpg}
+}
+\quad
+\subfigure[$\alpha$=100, style=No. 21]{
+\includegraphics[width=6cm]{figure/eval/eval-st21/20151102_031615.jpg}
+}
+\caption{Synthesized images for test image No. 8}
+\end{figure}
+
+\end{document}
